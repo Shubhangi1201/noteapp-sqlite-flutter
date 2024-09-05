@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite_crud/NoteProvider.dart';
 import 'package:sqflite_crud/note_screen.dart';
 
 void main() {
@@ -11,7 +13,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider( providers: [
+          ChangeNotifierProvider(create: (context)=> NoteProvider())
+       ],
+      child: MaterialApp(
+
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -19,7 +25,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const NoteScreen(),
-    );
+    ),);
+
+
   }
 }
 
