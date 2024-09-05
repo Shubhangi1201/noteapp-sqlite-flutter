@@ -27,7 +27,12 @@ class _NoteScreenState extends State<NoteScreen> {
   void getDbData() async {
     List<NoteModel> notes = await noteDao.getNotes();
     Provider.of<NoteProvider>(context, listen: false).updateNoteList(notes);
-     }
+  }
+
+  void deleteNote(NoteModel note) async {
+    await noteDao.deleteNote(note);
+    getDbData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,26 +40,27 @@ class _NoteScreenState extends State<NoteScreen> {
       appBar: AppBar(
         title: Text("Notes"),
       ),
-      // body: ListView(
-      //   children: [
-      //       ListTile(
-      //         title: Text("title"),
-      //         subtitle: Text("descritpion"),
-      //         trailing: Icon(Icons.delete),
-      //       )
-      //   ],
-      // ),
-
       body: ListView.builder(
-          itemCount: Provider.of<NoteProvider>(context, listen: true).noteList.length,
+          itemCount:
+              Provider.of<NoteProvider>(context, listen: true).noteList.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text(Provider.of<NoteProvider>(context, listen: true).noteList[index].title),
-              subtitle: Text(Provider.of<NoteProvider>(context, listen: true).noteList[index].desc),
-              trailing: Icon(Icons.delete),
+              title: Text(Provider.of<NoteProvider>(context, listen: true)
+                  .noteList[index]
+                  .title),
+              subtitle: Text(Provider.of<NoteProvider>(context, listen: true)
+                  .noteList[index]
+                  .desc),
+              trailing: InkWell(
+                  onTap: () {
+                    NoteModel note =
+                        Provider.of<NoteProvider>(context, listen: false)
+                            .noteList[index];
+                    deleteNote(note);
+                  },
+                  child: Icon(Icons.delete)),
             );
-          }
-          ),
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(

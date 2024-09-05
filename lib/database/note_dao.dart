@@ -39,4 +39,13 @@ class NoteDao{
     return futureList;
   }
 
+  Future<void> deleteNote(NoteModel note) async{
+    final db = await dbProvider.database;
+    try{
+      await db.delete("notes", where: 'id = ?', whereArgs: [note.id]);
+    }catch(e){
+      print(e);
+    }
+  }
+
 }
