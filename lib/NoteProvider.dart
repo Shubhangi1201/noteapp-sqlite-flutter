@@ -16,4 +16,12 @@ class NoteProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  int _currentNoteId = 1;
+
+  int get currentNoteId => _currentNoteId;
+
+  void setCurrentNoteId(int currentId){
+    _currentNoteId = currentId;
+    notifyListeners();
+  }
 }

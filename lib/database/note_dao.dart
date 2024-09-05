@@ -47,5 +47,14 @@ class NoteDao{
       print(e);
     }
   }
+  
+  Future<void> updateNote(NoteModel note) async{
+    final db = await dbProvider.database;
+    try{
+      await db.update("notes", note.toMap(), where: 'id = ?', whereArgs: [note.id] );
+    }catch(e){
+      print(e);
+    }
+  }
 
 }

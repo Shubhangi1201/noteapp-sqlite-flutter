@@ -19,19 +19,46 @@ class _NoteScreenState extends State<NoteScreen> {
   TextEditingController descController = TextEditingController();
   NoteDao noteDao = NoteDao();
 
+
   @override
   void initState() {
     getDbData();
   }
+  void insertNote(String title, String desc) async {
+    NoteModel note = NoteModel(title: title, desc: desc);
+    try {
+      await noteDao.insertNote(note: note);
+      getDbData();
+    } catch (e) {
+      print('error in note_screen.dart');
+    }
+    Navigator.pop(context);
+  }
+
 
   void getDbData() async {
     List<NoteModel> notes = await noteDao.getNotes();
+    print(notes);
     Provider.of<NoteProvider>(context, listen: false).updateNoteList(notes);
   }
+
 
   void deleteNote(NoteModel note) async {
     await noteDao.deleteNote(note);
     getDbData();
+  }
+
+  void updateNote(String title, String desc, int id)async{
+   //
+   //  NoteModel note = NoteModel(id: id, title: title, desc: desc);
+   // try{
+   //   await noteDao.updateNote(note);
+   //   getDbData();
+   // }catch(e){
+   //   print(e);
+   // }
+   //
+   // Navigator.pop(context);
   }
 
   @override
@@ -51,38 +78,44 @@ class _NoteScreenState extends State<NoteScreen> {
               subtitle: Text(Provider.of<NoteProvider>(context, listen: true)
                   .noteList[index]
                   .desc),
-              trailing: InkWell(
-                  onTap: () {
-                    NoteModel note =
-                        Provider.of<NoteProvider>(context, listen: false)
-                            .noteList[index];
-                    deleteNote(note);
-                  },
-                  child: Icon(Icons.delete)),
+
+              trailing: Column(
+                children: [
+                  InkWell(
+                      onTap: () {
+                        NoteModel note =
+                            Provider.of<NoteProvider>(context, listen: false)
+                                .noteList[index];
+                        deleteNote(note);
+                      },
+                      child: Icon(Icons.delete)),
+                  SizedBox(height: 8,),
+                  InkWell(
+                    onTap: (){
+                      var id = Provider.of<NoteProvider>(context, listen: true).noteList[index].id;
+                      print(id);
+                      // Provider.of<NoteProvider>(context, listen: false).setCurrentNoteId(id!);
+                      // showDialog(context: context, builder: (context)=>AlertDialogWidget("update"));
+                    },
+                    child: Icon(Icons.edit),
+                  )
+                ],
+              ),
             );
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
-              context: context, builder: (context) => AlertDialogWidget());
+              context: context, builder: (context) => AlertDialogWidget("add"));
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void insertNote(String title, String desc) async {
-    NoteModel note = NoteModel(title: title, desc: desc);
-    try {
-      await noteDao.insertNote(note: note);
-      getDbData();
-    } catch (e) {
-      print('error in note_screen.dart');
-    }
-    Navigator.pop(context);
-  }
 
-  Widget AlertDialogWidget() {
+
+  Widget AlertDialogWidget(String eventType) {
     return AlertDialog(
       title: Text("Add Note"),
       content: Column(
@@ -110,7 +143,12 @@ class _NoteScreenState extends State<NoteScreen> {
           ),
           ElevatedButton(
               onPressed: () {
+                if(eventType == "update"){
+                  int id = Provider.of<NoteProvider>(context, listen: false).currentNoteId;
+                  updateNote(noteController.text, descController.text, id);
+                }else{
                 insertNote(noteController.text, descController.text);
+                }
               },
               child: Text("Submit"))
         ],
